@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Assignments | Faculty Portal{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>Manage <span class="text-gradient">Assignments</span></h1>
+</div>
+<div class="glass-panel" style="padding: 20px; margin-bottom: 30px;">
+    <h3>Create New Assignment</h3>
+    <form action="{{ url_for('main.create_assignment') }}" method="POST" enctype="multipart/form-data">
+        <div class="form-group" style="display: flex; gap: 20px;">
+            <div style="flex: 1;">
+                <label>Course Name</label>
+                <select name="course_name" required style="width: 100%; padding: 10px 14px; background: var(--bg-card); border: 1px solid #d1d5db; border-radius: 8px; color: var(--text-main); font-size: 1rem; outline: none; cursor: pointer;">
+                    {% for data in assigned_data|unique(attribute='course_name') %}
+                    <option value="{{ data.course_name }}">{{ data.course_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div style="flex: 1;">
+                <label>Batch</label>
+                <select name="batch" required style="width: 100%; padding: 10px 14px; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main); font-size: 1rem; outline: none; cursor: pointer;">
+                    <optgroup label="BCA - Section A" style="background: var(--bg-body); color: var(--text-main);">
+                        <option value="BCA- A1">BCA- A1</option>
+                        <option value="BCA- A2">BCA- A2</option>
+                        <option value="BCA- A3">BCA- A3</option>
+                    </optgroup>
+                    <optgroup label="BCA - Section B" style="background: var(--bg-body); color: var(--text-main);">
+                        <option value="BCA- B1">BCA- B1</option>
+                        <option value="BCA- B2">BCA- B2</option>
+                        <option value="BCA- B3">BCA- B3</option>
+                    </optgroup>
+                    <optgroup label="BCA - Section C" style="background: var(--bg-body); color: var(--text-main);">
+                        <option value="BCA- C1">BCA- C1</option>
+                        <option value="BCA- C2">BCA- C2</option>
+                        <option value="BCA- C3">BCA- C3</option>
+                    </optgroup>
+                    <optgroup label="MCA" style="background: var(--bg-body); color: var(--text-main);">
+                        <option value="MCA">MCA</option>
+                    </optgroup>
+                </select>
+            </div>
+        </div>
+        <div class="form-group"><label>Title</label><input type="text" name="title" required></div>
+        <div class="form-group"><label>Description</label><input type="text" name="description" required></div>
+        <div class="form-group"><label>Deadline</label><input type="datetime-local" name="deadline" required></div>
+        <div class="form-group"><label>Attachment (Optional)</label><input type="file" name="assignment_file"></div>
+        <button type="submit" class="btn-primary" style="width: auto;">Post Assignment</button>
+    </form>
+</div>
+
+<div class="glass-panel" style="padding: 20px;">
+    <h3>Past Assignments</h3>
+    {% for assign in assignments %}
+    <div style="padding: 15px; border: 1px solid var(--glass-border); border-radius: 8px; margin-top: 15px;">
+        <h4>{{ assign.title }} ({{ assign.course_name }})</h4>
+        <p>{{ assign.description }}</p>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">Deadline: {{ assign.deadline }}</p>
+        <form action="{{ url_for('main.delete_assignment', assignment_id=assign._id) }}" method="POST" style="margin-top: 10px;">
+            <button type="submit" class="btn-primary" style="background: var(--danger); width: auto; padding: 5px 10px; font-size: 0.85rem;">Delete</button>
+        </form>
+    </div>
+    {% else %}
+    <p>No assignments posted yet.</p>
+    {% endfor %}
+</div>
+{% endblock %}

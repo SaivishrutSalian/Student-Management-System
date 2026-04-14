@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}View Students | Faculty Portal{% endblock %}
+{% block extra_head %}
+<style>
+    .btn-sm { padding: 8px 16px; font-size: 0.85rem; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>Student <span class="text-gradient">Grading & Overview</span></h1>
+    <p>View your assigned students and manage their profiles.</p>
+</div>
+
+<div class="glass-panel" style="padding: 0; overflow: hidden;">
+    <table class="students-table">
+        <thead>
+            <tr>
+                <th>Registration No.</th>
+                <th>Student Name</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td style="color: var(--text-muted);">{{ student.reg_no }}</td>
+                <td><div style="font-weight: 600;">{{ student.name }}</div></td>
+                <td>
+                    <a href="{{ url_for('main.student_profile', student_email=student.email, course_name=student.course_name) }}" class="btn-primary btn-sm" style="text-decoration: none; display: inline-block;">View Profile</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="3" style="text-align: center; padding: 30px; color: var(--text-muted);">No students assigned yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

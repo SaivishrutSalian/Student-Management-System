@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Attendance | Faculty Portal{% endblock %}
+{% block extra_head %}
+{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>Track <span class="text-gradient">Attendance</span></h1>
+    <p>Mark students present or absent.</p>
+</div>
+<div class="glass-panel" style="padding: 20px;">
+    <form action="{{ url_for('main.save_attendance') }}" method="POST">
+        <div class="form-group" style="max-width: 300px; margin-bottom: 20px;">
+            <label>Date</label>
+            <input type="date" name="date" required>
+        </div>
+        <div class="form-group" style="max-width: 300px; margin-bottom: 20px;">
+            <label>Course Name</label>
+            <select name="course_name" required style="width: 100%; padding: 10px 14px; background: var(--bg-card); border: 1px solid #d1d5db; border-radius: 8px; color: var(--text-main); font-size: 1rem; box-shadow: var(--shadow-sm); outline: none; cursor: pointer;">
+                {% for course in assigned_courses %}
+                <option value="{{ course.course_name }}">{{ course.course_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <table class="attendance-table">
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.name }}</td>
+                    <td>{{ student.email }}</td>
+                    <td>
+                        <label><input type="radio" name="status_{{ student.email }}" value="Present" required> Present</label>
+                        <br>
+                        <label><input type="radio" name="status_{{ student.email }}" value="Absent"> Absent</label>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div style="margin-top: 20px; text-align: right;">
+            <a href="{{ url_for('main.export_attendance') }}" class="btn-secondary">Export to CSV</a>
+            <button type="submit" class="btn-primary" style="width: auto; margin-left: 10px;">Save Attendance</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

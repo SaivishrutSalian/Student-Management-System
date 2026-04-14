@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}Announcements | Faculty Portal{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>Post <span class="text-gradient">Announcement</span></h1>
+</div>
+<div class="glass-panel" style="padding: 20px; margin-bottom: 30px;">
+    <form action="{{ url_for('main.post_announcement') }}" method="POST">
+        <div class="form-group"><label>Title</label><input type="text" name="title" required></div>
+        <div class="form-group" style="display: flex; gap: 20px;">
+            <div style="flex: 1;">
+                <label>Course Name</label>
+                <select name="course_name" required style="width: 100%; padding: 10px 14px; background: var(--bg-card); border: 1px solid #d1d5db; border-radius: 8px; color: var(--text-main); font-size: 1rem; outline: none; cursor: pointer;">
+                    {% for data in assigned_data|unique(attribute='course_name') %}
+                    <option value="{{ data.course_name }}">{{ data.course_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div style="flex: 1;">
+                <label>Batch</label>
+                <select name="batch" required style="width: 100%; padding: 10px 14px; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main); font-size: 1rem; outline: none; cursor: pointer;">
+                    <optgroup label="BCA - Section A" style="background: var(--bg-body); color: var(--text-main);">
+                        <option value="BCA- A1">BCA- A1</option>
+                        <option value="BCA- A2">BCA- A2</option>
+                        <option value="BCA- A3">BCA- A3</option>
+                    </optgroup>
+                    <optgroup label="BCA - Section B" style="background: var(--bg-body); color: var(--text-main);">
+                        <option value="BCA- B1">BCA- B1</option>
+                        <option value="BCA- B2">BCA- B2</option>
+                        <option value="BCA- B3">BCA- B3</option>
+                    </optgroup>
+                    <optgroup label="BCA - Section C" style="background: var(--bg-body); color: var(--text-main);">
+                        <option value="BCA- C1">BCA- C1</option>
+                        <option value="BCA- C2">BCA- C2</option>
+                        <option value="BCA- C3">BCA- C3</option>
+                    </optgroup>
+                    <optgroup label="MCA" style="background: var(--bg-body); color: var(--text-main);">
+                        <option value="MCA">MCA</option>
+                    </optgroup>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Message</label>
+            <textarea name="message" required style="width: 100%; height: 100px; padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border);"></textarea>
+        </div>
+        <button type="submit" class="btn-primary" style="width: auto;">Broadcast</button>
+    </form>
+</div>
+
+<div class="glass-panel" style="padding: 20px;">
+    <h3>Past Announcements</h3>
+    {% for ann in announcements %}
+    <div style="padding: 15px; border: 1px solid var(--glass-border); border-radius: 8px; margin-top: 15px;">
+        <h4>{{ ann.title }}</h4>
+        <p>{{ ann.message }}</p>
+        <small style="color: var(--text-muted);">{{ ann.course_name }}{% if ann.batch %} ({{ ann.batch }}){% endif %} - {{ ann.date_posted }}</small>
+    </div>
+    {% else %}
+    <p>No announcements yet.</p>
+    {% endfor %}
+</div>
+{% endblock %}

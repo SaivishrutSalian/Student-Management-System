@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard | Faculty Portal{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>Welcome back, {{ faculty_name }}!</h1>
+    <p>Here is an overview of your assigned courses.</p>
+</div>
+
+<div class="dashboard-grid">
+    {% for course in assigned_data %}
+    <div class="course-card">
+        <h3>{{ course.course_name }}</h3>
+        <div class="course-meta">
+            <span>Batch: {{ course.batch }}</span>
+            <span>Students: {{ course.students }}</span>
+        </div>
+        <div class="course-actions">
+            <a href="{{ url_for('main.students_view') }}" class="btn-secondary">View Students</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

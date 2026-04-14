@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% block title %}Course Materials | Faculty Portal{% endblock %}
+{% block extra_head %}
+<style>
+    .materials-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+    .material-card { background: var(--bg-card); border-left: 4px solid var(--brand-secondary); padding: 20px; border-radius: 12px; box-shadow: var(--shadow-sm); transition: var(--transition-fast); display: flex; flex-direction: column; justify-content: space-between;}
+    .material-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+    .material-title { font-weight: 600; color: var(--text-main); font-size: 1.15rem; margin-bottom: 8px; }
+    .material-course { font-size: 0.95rem; color: var(--brand-secondary); font-weight: 600; margin-bottom: 12px; }
+    .material-meta { display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;}
+    .material-meta span { display: flex; align-items: center; gap: 8px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Course <span class="text-gradient">Materials</span></h1>
+    <p>Upload, manage, and share documents with your classes.</p>
+</div>
+
+<!-- Upload Panel -->
+<div class="glass-panel" style="padding: 24px; margin-bottom: 40px; background: rgba(30, 41, 59, 0.85); border: 1px solid var(--border-color);">
+    <h3 style="margin-bottom: 16px; color: var(--text-inverse); font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+        <svg style="width: 20px; height: 20px; color: var(--brand-accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+        Upload New Material
+    </h3>
+    <form action="{{ url_for('main.upload_material') }}" method="POST" enctype="multipart/form-data" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+        <div class="form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+            <input type="text" name="title" placeholder="Document Title (e.g. Chapter 1 Notes)" required style="padding: 10px 14px; font-size: 0.95rem;">
+        </div>
+        <div class="form-group" style="flex: 1; min-width: 150px; margin-bottom: 0;">
+            <input type="text" name="course" placeholder="Course Name" required style="padding: 10px 14px; font-size: 0.95rem;">
+        </div>
+        <div class="form-group" style="flex: 1; min-width: 150px; margin-bottom: 0;">
+            <select name="batch" required style="width: 100%; padding: 10px 14px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main); font-size: 0.95rem; outline: none;">
+                <option value="" disabled selected style="background: var(--bg-body); color: var(--text-muted);">Select Batch</option>
+                <optgroup label="BCA - Section A" style="background: var(--bg-body); color: var(--text-main);">
+                    <option value="BCA- A1">BCA- A1</option>
+                    <option value="BCA- A2">BCA- A2</option>
+                    <option value="BCA- A3">BCA- A3</option>
+                </optgroup>
+                <optgroup label="BCA - Section B" style="background: var(--bg-body); color: var(--text-main);">
+                    <option value="BCA- B1">BCA- B1</option>
+                    <option value="BCA- B2">BCA- B2</option>
+                    <option value="BCA- B3">BCA- B3</option>
+                </optgroup>
+                <optgroup label="BCA - Section C" style="background: var(--bg-body); color: var(--text-main);">
+                    <option value="BCA- C1">BCA- C1</option>
+                    <option value="BCA- C2">BCA- C2</option>
+                    <option value="BCA- C3">BCA- C3</option>
+                </optgroup>
+                <optgroup label="MCA" style="background: var(--bg-body); color: var(--text-main);">
+                    <option value="MCA">MCA</option>
+                </optgroup>
+            </select>
+        </div>
+        <div class="form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+            <input type="file" name="file" accept=".pdf,.doc,.docx,.ppt,.pptx" required style="padding: 8px; width: 100%; background: rgba(255,255,255,0.05); color: var(--text-main); border: 1px dashed var(--brand-secondary); border-radius: 8px;">
+        </div>
+        <button type="submit" class="btn-primary" style="height: 42px; white-space: nowrap;">Upload File</button>
+    </form>
+</div>
+
+{% if session.get('role') == 'hod' %}
+<div class="filter-panel" style="margin-bottom: 25px; padding: 15px; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--brand-secondary); display: flex; align-items: center; gap: 15px;">
+    <strong style="color: var(--text-main); font-size: 1.05rem;">
+        <svg style="width: 20px; height: 20px; vertical-align: middle; margin-right: 5px; color: var(--brand-primary);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+        Filter Hub by Faculty
+    </strong>
+    <form method="GET" action="{{ url_for('main.materials_view') }}" style="display: flex; gap: 10px; margin:0;" id="filter-form">
+        <select name="faculty_filter" onchange="document.getElementById('filter-form').submit()" style="padding: 8px 14px; background: rgba(30, 41, 59, 1); border: 1px solid var(--brand-primary); border-radius: 6px; color: white; min-width: 200px; outline: none; cursor: pointer;">
+            <option value="">-- View All Materials --</option>
+            {% for fac in faculties %}
+            <option value="{{ fac.email }}" {% if selected_faculty == fac.email %}selected{% endif %}>{{ fac.name }}</option>
+            {% endfor %}
+        </select>
+    </form>
+</div>
+{% endif %}
+
+<div class="materials-grid">
+    {% for mat in materials %}
+    <div class="material-card">
+        <div>
+            <div class="material-title">{{ mat.title }}</div>
+            <div class="material-course">{{ mat.course }}</div>
+            <div class="material-meta">
+                <span>
+                    <svg style="width: 16px; height: 16px; color: var(--brand-accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg> 
+                    {{ mat.faculty_name }}
+                </span>
+                <span>
+                    <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg> 
+                    Batch: {{ mat.batch }}
+                </span>
+                <span>
+                    <svg style="width:16px; height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    {{ mat.upload_date }}
+                </span>
+            </div>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 15px;">
+            <a href="{{ url_for('static', filename='uploads/materials/' + mat.filepath) }}" class="btn-primary" style="padding: 6px 12px; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; text-decoration: none;" download>
+                <svg style="width: 14px; height: 14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                Download
+            </a>
+            
+            {% if session.get('role') == 'hod' or session.get('faculty_email') == mat.faculty_email %}
+            <form action="{{ url_for('main.delete_material', material_id=mat['_id']) }}" method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to permanently delete this file?');">
+                <button type="submit" style="background: none; border: none; color: #f87171; cursor: pointer; padding: 4px; display: flex; align-items: center; gap: 4px; font-size: 0.85rem;">
+                    <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    Delete
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted); background: var(--bg-card); border-radius: 12px; border: 1px dashed var(--brand-secondary);">
+        <svg style="width: 48px; height: 48px; margin: 0 auto 15px; opacity: 0.5;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+        <p style="font-size: 1.1rem; margin-bottom: 5px;">No files found.</p>
+        <p style="font-size: 0.9rem;">Upload a new document to get started.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
